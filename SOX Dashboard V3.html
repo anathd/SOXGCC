@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SOX GCC Delivery Dashboard</title>
+  <style>
+    :root {
+      --lowes-blue: #004990;
+      --lowes-white: #FFFFFF;
+      --lowes-light-blue: #15b6e5;
+      --lowes-gray: #f5f7fa;
+      --lowes-dark-blue: #002f60;
+      --radius-base: 12px;
+      --font-family: "Segoe UI", "Inter", Arial, sans-serif;
+      --font-size-base: 16px;
+      --shadow-sm: 0 2px 8px rgba(0, 73, 144, 0.08);
+      --shadow-md: 0 4px 16px rgba(0, 73, 144, 0.12);
+      --shadow-lg: 0 8px 32px rgba(0, 73, 144, 0.16);
+    }
+    
+    * {
+      box-sizing: border-box;
+    }
+    
+    html, body {
+      height: 100%;
+      margin: 0;
+      font-family: var(--font-family);
+      background: linear-gradient(135deg, #f5f7fa 0%, #e8eef5 100%);
+      color: var(--lowes-blue);
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--lowes-blue) 0%, var(--lowes-dark-blue) 100%);
+      padding: 24px 32px;
+      border-radius: var(--radius-base);
+      box-shadow: var(--shadow-lg);
+      margin-bottom: 2.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.05) 50%, transparent 70%);
+      animation: shimmer 3s infinite;
+    }
+    
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+    
+    .header-content {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .logo {
+      width: 100px;
+      height: 45px;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+    }
+    
+    .dashboard-title {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--lowes-white);
+      letter-spacing: 1.2px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    .summary-boxes {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+    
+    .summary-box {
+      background: linear-gradient(135deg, var(--lowes-white) 0%, #f8fbff 100%);
+      border-radius: var(--radius-base);
+      padding: 20px 24px;
+      box-shadow: var(--shadow-md);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      border-top: 4px solid var(--lowes-blue);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .summary-box::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, transparent 0%, rgba(21, 182, 229, 0.03) 100%);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    
+    .summary-box:hover::before {
+      opacity: 1;
+    }
+    
+    .summary-box.completed {
+      background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+      border-top: 4px solid #4caf50;
+      box-shadow: 0 4px 16px rgba(76, 175, 80, 0.25), 0 0 24px rgba(76, 175, 80, 0.12);
+    }
+    
+    .summary-box.completed .summary-value {
+      color: #2e7d32;
+    }
+    
+    .summary-box.in-progress {
+      background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+      border-top: 4px solid #ff9800;
+      box-shadow: 0 4px 16px rgba(255, 152, 0, 0.25), 0 0 24px rgba(255, 152, 0, 0.12);
+    }
+    
+    .summary-box.in-progress .summary-value {
+      color: #e65100;
+    }
+    
+    .summary-box:hover {
+      transform: translateY(-4px) scale(1.02);
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .summary-value {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--lowes-blue);
+      line-height: 1;
+    }
+    
+    .summary-label {
+      font-size: 0.9rem;
+      color: var(--lowes-dark-blue);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .filters {
+      display: flex;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+    
+    .filter-group {
+      background: var(--lowes-white);
+      padding: 16px 24px;
+      border-radius: var(--radius-base);
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      border-bottom: 3px solid var(--lowes-light-blue);
+      transition: all 0.3s;
+      flex: 1;
+      min-width: 180px;
+    }
+    
+    .filter-group:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+    
+    label {
+      font-size: 0.9em;
+      color: var(--lowes-dark-blue);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    select, input[type="date"], input[type="text"] {
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: 2px solid #e0e7ef;
+      background: var(--lowes-white);
+      color: var(--lowes-dark-blue);
+      font-size: var(--font-size-base);
+      transition: all 0.3s;
+      font-family: var(--font-family);
+    }
+    
+    select:focus, input[type="date"]:focus, input[type="text"]:focus {
+      outline: none;
+      border-color: var(--lowes-light-blue);
+      box-shadow: 0 0 0 3px rgba(21, 182, 229, 0.1);
+    }
+    
+    .controls-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      background: var(--lowes-white);
+      border-radius: var(--radius-base);
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+    }
+    
+    .controls-table th,
+    .controls-table td {
+      padding: 16px 18px;
+      text-align: left;
+      border-bottom: 1px solid #edf2f7;
+      font-size: 1em;
+    }
+    
+    .controls-table tbody tr {
+      transition: all 0.2s;
+    }
+    
+    .controls-table tbody tr:hover {
+      background: linear-gradient(90deg, #f8fbff 0%, #f0f7ff 100%);
+      transform: scale(1.001);
+    }
+    
+    .controls-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+    
+    .delayed {
+      background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+      color: #c62828;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 6px;
+      display: inline-block;
+    }
+    
+    .controls-table th {
+      background: linear-gradient(135deg, var(--lowes-blue) 0%, var(--lowes-dark-blue) 100%);
+      color: var(--lowes-white);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-size: 0.9em;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      cursor: pointer;
+      user-select: none;
+    }
+    
+    .controls-table th.sortable {
+      position: relative;
+      padding-right: 30px;
+    }
+    
+    .controls-table th.sortable:hover {
+      background: linear-gradient(135deg, #005aa7 0%, #003d70 100%);
+    }
+    
+    .sort-icon {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      opacity: 0.4;
+      transition: opacity 0.2s;
+    }
+    
+    .sort-icon.active {
+      opacity: 1;
+    }
+    
+    .sort-arrow {
+      width: 0;
+      height: 0;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+    }
+    
+    .sort-arrow.up {
+      border-bottom: 6px solid currentColor;
+    }
+    
+    .sort-arrow.down {
+      border-top: 6px solid currentColor;
+    }
+    
+    .sort-arrow.active {
+      opacity: 1;
+      color: var(--lowes-light-blue);
+    }
+    
+    .edit-btn {
+      background: linear-gradient(135deg, var(--lowes-light-blue) 0%, #0d9bc7 100%);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9em;
+      font-weight: 600;
+      transition: all 0.3s;
+      box-shadow: 0 2px 8px rgba(21, 182, 229, 0.3);
+    }
+    
+    .edit-btn:hover {
+      background: linear-gradient(135deg, var(--lowes-blue) 0%, var(--lowes-dark-blue) 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 73, 144, 0.4);
+    }
+    
+    .edit-btn:active {
+      transform: translateY(0);
+    }
+    
+    .progress-bar-wrapper {
+      background: #e8eef5;
+      border-radius: 12px;
+      height: 28px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
+    }
+    
+    .progress-bar {
+      height: 100%;
+      border-radius: 12px;
+      transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      background: linear-gradient(90deg, var(--lowes-blue) 0%, var(--lowes-light-blue) 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .progress-bar::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
+      animation: progress-shine 2s infinite;
+    }
+    
+    @keyframes progress-shine {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+    
+    .progress-text {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      font-weight: 700;
+      font-size: 0.85em;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+    
+    .milestones {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2.5rem;
+    }
+    
+    .milestone-card {
+      background: linear-gradient(135deg, var(--lowes-white) 0%, #f8fbff 100%);
+      border-radius: var(--radius-base);
+      padding: 20px;
+      box-shadow: var(--shadow-md);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      border-left: 5px solid var(--lowes-blue);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .milestone-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, transparent 0%, rgba(21, 182, 229, 0.05) 100%);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    
+    .milestone-card:hover::before {
+      opacity: 1;
+    }
+    
+    .milestone-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .milestone-date {
+      font-size: 1.15em;
+      color: var(--lowes-blue);
+      font-weight: 700;
+    }
+    
+    .milestone-label {
+      color: var(--lowes-dark-blue);
+      font-size: 0.85em;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    #editPanel {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: 0 20px 60px rgba(0,73,144,0.3);
+      z-index: 1000;
+      min-width: 450px;
+      max-width: 90vw;
+    }
+    
+    #editPanel h3 {
+      margin-top: 0;
+      color: var(--lowes-blue);
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+    
+    #editPanel .input-group {
+      margin-bottom: 20px;
+    }
+    
+    #editPanel label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      font-size: 0.9em;
+    }
+    
+    #editPanel input,
+    #editPanel select {
+      width: 100%;
+      padding: 10px 14px;
+      border: 2px solid #e0e7ef;
+      border-radius: 8px;
+      font-size: 1em;
+    }
+    
+    #editPanel .button-group {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      margin-top: 24px;
+    }
+    
+    #editPanel button {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 1em;
+      transition: all 0.3s;
+    }
+    
+    #editPanel .cancel-btn {
+      background: #e0e7ef;
+      color: var(--lowes-dark-blue);
+    }
+    
+    #editPanel .cancel-btn:hover {
+      background: #d0d7df;
+    }
+    
+    #editPanel .save-btn {
+      background: linear-gradient(135deg, var(--lowes-blue) 0%, var(--lowes-dark-blue) 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(0, 73, 144, 0.3);
+    }
+    
+    #editPanel .save-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 73, 144, 0.4);
+    }
+    
+    #editOverlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 47, 96, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 999;
+    }
+    
+    @media (max-width: 900px) {
+      .container { padding: 1rem; }
+      .dashboard-title { font-size: 1.5rem; }
+      .summary-boxes { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+      .filters { flex-direction: column; }
+      #editPanel { min-width: 90vw; padding: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <img src="https://www.lowescdn.com/images/logos/lowes_logo_white.png" alt="Lowe's Logo" class="logo">
+      <span class="dashboard-title">SOX GCC Delivery Dashboard</span>
+    </div>
+  </header>
+  
+  <div class="container">
+    <section class="summary-boxes" id="summaryBoxes"></section>
+
+    <form id="filters" class="filters" autocomplete="off">
+      <div class="filter-group">
+        <label for="nameFilter">Control Name</label>
+        <input type="text" id="nameFilter" placeholder="Search control name..." />
+      </div>
+      <div class="filter-group">
+        <label for="controlTypeFilter">Control Type</label>
+        <select id="controlTypeFilter" name="controlType">
+          <option value="All">All</option>
+          <option value="Reliance">Reliance</option>
+          <option value="Independent">Independent</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label for="dateFilter">Completion Date Before</label>
+        <input type="date" id="dateFilter" name="dateFilter" />
+      </div>
+      <div class="filter-group">
+        <label for="progressFilter">Completion ≥</label>
+        <select id="progressFilter">
+          <option value="0">0%</option>
+<option value="0.1">10%</option>
+          <option value="0.25">25%</option>
+          <option value="0.5">50%</option>
+          <option value="0.75">75%</option>
+          <option value="1">100%</option>
+        </select>
+      </div>
+    </form>
+
+    <table class="controls-table" id="controlsTable">
+      <thead>
+        <tr>
+          <th>Control Name</th>
+          <th>Type</th>
+          <th>Completion Date</th>
+          <th class="sortable" onclick="sortByProgress()">
+            Progress
+            <span class="sort-icon" id="sortIcon">
+              <span class="sort-arrow up"></span>
+              <span class="sort-arrow down"></span>
+            </span>
+          </th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <section class="milestones" id="milestonesSection"></section>
+    
+    <div id="editPanel">
+      <h3>Edit Control</h3>
+      <input type="hidden" id="editIndex" />
+      <div class="input-group">
+        <label>Control Name</label>
+        <input type="text" id="editName" />
+      </div>
+      <div class="input-group">
+        <label>Type</label>
+        <select id="editType">
+          <option value="Reliance">Reliance</option>
+          <option value="Independent">Independent</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label>Completion Date</label>
+        <input type="date" id="editDate" />
+      </div>
+      <div class="input-group">
+        <label>Progress (%)</label>
+        <input type="number" id="editProgress" min="0" max="100" />
+      </div>
+      <div class="button-group">
+        <button type="button" class="cancel-btn" onclick="closeEditPanel()">Cancel</button>
+        <button type="button" class="save-btn" onclick="saveEdit()">Save</button>
+      </div>
+    </div>
+    <div id="editOverlay" onclick="closeEditPanel()"></div>
+  </div>
+
+  <script>
+    const controls = [
+      {name:"AC7.2 Emergency ID Provisioning",type:"Reliance",date:"2025-11-21",progress:1.0},
+      {name:"AC9.1 - User Provisioning",type:"Reliance",date:"2026-01-28",progress:0.1},
+      {name:"AC9.4 - Employee Transfers",type:"Independent",date:"2025-11-29",progress:1.0},
+      {name:"AC11.1 - Terminations Standard Automated Process",type:"Reliance",date:"2025-12-03",progress:0.0},
+      {name:"AC11.3 - Inactive User Account Maintenance",type:"Reliance",date:"2025-12-02",progress:0.85},
+      {name:"AC11.4 - IT Contractor Terminations",type:"Reliance",date:"2025-12-03",progress:0.4},
+      {name:"AC16.5 - Review of Access for Direct Changes to SOX Distributed Databases",type:"Independent",date:"2025-12-05",progress:0.0},
+      {name:"AC16.7 - CVS SOD Review",type:"Independent",date:"2025-12-13",progress:0.0},
+      {name:"AC19.1 - Elevated Access",type:"Independent",date:"2025-11-28",progress:0.85},
+      {name:"AC20.4 - Review of Access for Direct Changes to SOX Distributed Databases",type:"Independent",date:"2025-11-28",progress:0.85},
+      {name:"AC19.5 - Elevated Access - Validation of Elevated Access Scope for Certifications",type:"Reliance",date:"2025-12-29",progress:0.0},
+      {name:"CM12.2 - SOX Application Password Configuration Settings",type:"Reliance",date:"2026-01-28",progress:0.5},
+      {name:"CM16.5 - Bitbucket Pull Request Master Configuration Enabled",type:"Reliance",date:"2026-01-17",progress:0.0},
+      {name:"CC 1.6 - Application Change Review Workday",type:"Reliance",date:"2026-01-09",progress:0.0},
+      {name:"CC 1.6 - Application Change Review LX",type:"Reliance",date:"2026-01-09",progress:0.0},
+      {name:"CC 1.3 - Change Management",type:"Independent",date:"2026-01-28",progress:0.0},
+      {name:"CC 06.6 - DBA Direct Data Changes Made to Teradata and DB2 for zOS Are Reviewed",type:"Independent",date:"2025-12-06",progress:0.0},
+      {name:"CO 5.2 - Production Infrastructure Storage, Database Backup and Restoration",type:"Reliance",date:"2025-11-28",progress:0.85},
+      {name:"CO2.1 - Production Mainframe Job Monitoring",type:"Reliance",date:"2025-12-08",progress:0.0},
+      {name:"CO02.4 ERP to FDI alert mechanism",type:"Independent",date:"2026-01-09",progress:0.0},
+      {name:"CO2.3 - Production Job Monitoring - Distributed",type:"Independent",date:"2026-01-17",progress:0.1},
+      {name:"CO02.5 - Sail Point Batch Monitoring",type:"Reliance",date:"2025-12-12",progress:0.0},
+      {name:"MC 1.5 - Security Incident Event Management Review",type:"Reliance",date:"2025-12-07",progress:0.0},
+      {name:"SD01.1 - System Development - Project Selection ",type:"Independent",date:"2025-12-12",progress:0.0},
+      {name:"SD01.2 - System Development - Stage Gates",type:"Independent",date:"2026-01-17",progress:0.0},
+      {name:"MC20.2 - Review of Controls",type:"Independent",date:"2025-11-21",progress:1.0}
+    ];
+    
+    let sortOrder = null; // null, 'asc', 'desc'
+    
+    function percent(num) { return Math.round(num * 100) + "%"; }
+
+    function renderSummary() {
+      const total = controls.length;
+      const completed = controls.filter(c => c.progress === 1).length;
+      const inProgress = controls.filter(c => c.progress > 0 && c.progress < 1).length;
+      const reliance = controls.filter(c => c.type === "Reliance").length;
+      const independent = controls.filter(c => c.type === "Independent").length;
+      
+      const section = document.getElementById("summaryBoxes");
+      section.innerHTML = `
+        <div class="summary-box">
+          <div class="summary-value">${total}</div>
+          <div class="summary-label">Total Controls</div>
+        </div>
+        <div class="summary-box completed">
+          <div class="summary-value">${completed}</div>
+          <div class="summary-label">Completed</div>
+        </div>
+        <div class="summary-box in-progress">
+          <div class="summary-value">${inProgress}</div>
+          <div class="summary-label">In Progress</div>
+        </div>
+        <div class="summary-box">
+          <div class="summary-value">${reliance}</div>
+          <div class="summary-label">Reliance Controls</div>
+        </div>
+        <div class="summary-box">
+          <div class="summary-value">${independent}</div>
+          <div class="summary-label">Independent Controls</div>
+        </div>
+      `;
+    }
+
+    function getFilteredControls() {
+      const nameVal = document.getElementById('nameFilter').value.toLowerCase();
+      const typeVal = document.getElementById('controlTypeFilter').value;
+      const dateVal = document.getElementById('dateFilter').value;
+      const progressVal = parseFloat(document.getElementById('progressFilter').value);
+
+      let filtered = controls.filter(c => {
+        let nameMatch = (!nameVal || c.name.toLowerCase().includes(nameVal));
+        let typeMatch = (typeVal === "All" || c.type === typeVal);
+        let dateMatch = (!dateVal || c.date <= dateVal);
+        let progMatch = (typeof c.progress === "number" ? c.progress >= progressVal : true);
+        return nameMatch && typeMatch && dateMatch && progMatch;
+      });
+      
+      // Apply sorting if active
+      if (sortOrder === 'asc') {
+        filtered.sort((a, b) => a.progress - b.progress);
+      } else if (sortOrder === 'desc') {
+        filtered.sort((a, b) => b.progress - a.progress);
+      }
+      
+      return filtered;
+    }
+    
+    function sortByProgress() {
+      if (sortOrder === null) {
+        sortOrder = 'desc';
+      } else if (sortOrder === 'desc') {
+        sortOrder = 'asc';
+      } else {
+        sortOrder = null;
+      }
+      
+      updateSortIcon();
+      renderTable();
+    }
+    
+    function updateSortIcon() {
+      const icon = document.getElementById('sortIcon');
+      const upArrow = icon.querySelector('.up');
+      const downArrow = icon.querySelector('.down');
+      
+      icon.classList.remove('active');
+      upArrow.classList.remove('active');
+      downArrow.classList.remove('active');
+      
+      if (sortOrder === 'asc') {
+        icon.classList.add('active');
+        upArrow.classList.add('active');
+      } else if (sortOrder === 'desc') {
+        icon.classList.add('active');
+        downArrow.classList.add('active');
+      }
+    }
+
+    function renderTable() {
+      const data = getFilteredControls();
+      const tbody = document.getElementById("controlsTable").querySelector("tbody");
+      const today = new Date().toISOString().split('T')[0];
+      tbody.innerHTML = '';
+      
+      data.forEach((c, idx) => {
+        const isDelayed = c.date < today && c.progress < 1;
+        const tr = document.createElement("tr");
+        const progressPercent = Math.round(c.progress * 100);
+        const progressColor = c.progress === 1 ? '#e0dd24' : '#111112';
+        
+        tr.innerHTML = `
+          <td>${c.name}</td>
+          <td>${c.type}</td>
+          <td>${isDelayed ? '<span class="delayed">' + c.date + ' ⚠ DELAYED</span>' : c.date}</td>
+          <td>
+            <div class="progress-bar-wrapper">
+              <div class="progress-bar" style="width:${Math.max(5, progressPercent)}%;"></div>
+              <span class="progress-text" style="color:${progressColor};">${percent(c.progress)}</span>
+            </div>
+          </td>
+          <td>
+            <button class="edit-btn" onclick="openEditPanel(${controls.indexOf(c)})">Edit</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderMilestones() {
+      const completed = controls.filter(c => c.progress === 1);
+      const today = new Date().toISOString().split('T')[0];
+      const fourteenDaysLater = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      const upcoming = controls.filter(c => c.date >= today && c.date <= fourteenDaysLater && c.progress < 1)
+                               .sort((a,b) => a.date.localeCompare(b.date));
+      const maxIncomplete = [...controls].filter(c=>c.progress<1).sort((a,b) => b.progress-a.progress)[0];
+      const section = document.getElementById("milestonesSection");
+      section.innerHTML = '';
+      
+      if (completed.length) {
+        completed.forEach(c=>{
+          const card = document.createElement('div');
+          card.className = 'milestone-card';
+          card.innerHTML = `
+            <span class="milestone-label">Delivered</span>
+            <div class="milestone-date">${c.name}</div>
+            <span style="color:#004990; font-size:0.95em;">${c.date}</span>
+            <span style="color:#4caf50; font-weight:700;">✓ Completed</span>
+          `;
+          section.appendChild(card);
+        });
+      }
+      
+      if (maxIncomplete) {
+        const card = document.createElement('div');
+        card.className = 'milestone-card';
+        card.innerHTML = `
+          <span class="milestone-label">Highest Progress</span>
+          <div class="milestone-date">${maxIncomplete.name}</div>
+          <span style="color:#004990; font-size:0.95em;">${maxIncomplete.date}</span>
+          <span style="color:#004990; font-weight:700;">${percent(maxIncomplete.progress)}</span>
+        `;
+        section.appendChild(card);
+      }
+      
+      if (upcoming.length) {
+        upcoming.forEach(c => {
+          const card = document.createElement('div');
+          card.className = 'milestone-card';
+          card.innerHTML = `
+            <span class="milestone-label">Upcoming Milestone</span>
+            <div class="milestone-date">${c.name}</div>
+            <span style="color:#004990; font-size:0.95em;">${c.date}</span>
+            <span style="color:#ff9800; font-weight:700;">⚠ Due Soon</span>
+          `;
+          section.appendChild(card);
+        });
+      }
+    }
+
+    document.getElementById("filters").addEventListener("input", ()=>{
+      renderTable();
+      renderMilestones();
+    });
+
+    renderSummary();
+    renderTable();
+    renderMilestones();
+    updateSortIcon();
+
+    window.updateControl = function(controlName, updates) {
+      const control = controls.find(c => c.name === controlName);
+      if (control) {
+        if (updates.date) control.date = updates.date;
+        if (updates.progress !== undefined) control.progress = updates.progress;
+        if (updates.type) control.type = updates.type;
+        renderSummary(); renderTable(); renderMilestones();
+        console.log(`✓ Updated: ${controlName}`);
+      } else {
+        console.error(`✗ Control not found: ${controlName}`);
+      }
+    }
+    
+    window.updateControls = function(newControls){
+      controls.length = 0;
+      newControls.forEach(c=>controls.push(c));
+      renderSummary(); renderTable(); renderMilestones();
+      console.log(`✓ Updated ${newControls.length} controls`);
+    }
+    
+    window.getControls = function() {
+      console.log(JSON.stringify(controls, null, 2));
+      return controls;
+    }
+    
+    window.openEditPanel = function(index) {
+      const control = controls[index];
+      document.getElementById('editIndex').value = index;
+      document.getElementById('editName').value = control.name;
+      document.getElementById('editType').value = control.type;
+      document.getElementById('editDate').value = control.date;
+      document.getElementById('editProgress').value = Math.round(control.progress * 100);
+      document.getElementById('editPanel').style.display = 'block';
+      document.getElementById('editOverlay').style.display = 'block';
+    }
+    
+    window.closeEditPanel = function() {
+      document.getElementById('editPanel').style.display = 'none';
+      document.getElementById('editOverlay').style.display = 'none';
+    }
+    
+    window.saveEdit = function() {
+      const index = parseInt(document.getElementById('editIndex').value);
+      controls[index].name = document.getElementById('editName').value;
+      controls[index].type = document.getElementById('editType').value;
+      controls[index].date = document.getElementById('editDate').value;
+      controls[index].progress = parseInt(document.getElementById('editProgress').value) / 100;
+      renderSummary();
+      renderTable();
+      renderMilestones();
+      closeEditPanel();
+      console.log(`✓ Updated: ${controls[index].name}`);
+    }
+    
+    console.log("%c📊 SOX Dashboard - Enhanced Version", "color: #004990; font-size: 16px; font-weight: bold;");
+    console.log("%c🎯 Click 'Edit' button in any row to update controls via UI", "color: #15b6e5; font-weight: bold;");
+    console.log("%c📈 Click 'Progress' header to sort by completion percentage", "color: #15b6e5; font-weight: bold;");
+    console.log("%cOr use console commands:", "color: #15b6e5; font-weight: bold;");
+    console.log('updateControl("AC7.2 Emergency ID Provisioning", {date: "2025-12-01", progress: 0.8})');
+    console.log('updateControls([{name:"AC7.2 Emergency ID Provisioning", type:"Reliance", date:"2025-12-01", progress:0.8}])');
+    console.log('getControls()');
+  </script>
+</body>
+</html>
