@@ -66,6 +66,54 @@
       100% { transform: translateX(100%); }
     }
     
+    .reset-btn {
+      position: absolute;
+      right: 32px;
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9em;
+      font-weight: 600;
+      transition: all 0.3s;
+      backdrop-filter: blur(10px);
+      z-index: 2;
+    }
+    
+    .reset-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+      border-color: rgba(255, 255, 255, 0.5);
+      transform: translateY(-2px);
+    }
+    
+    .save-notification {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+      color: white;
+      padding: 16px 24px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(76, 175, 80, 0.4);
+      font-weight: 600;
+      z-index: 10000;
+      display: none;
+      animation: slideIn 0.3s ease-out;
+    }
+    
+    @keyframes slideIn {
+      from {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    
     .header-content {
       display: flex;
       align-items: center;
@@ -546,6 +594,7 @@
       <img src="https://www.lowescdn.com/images/logos/lowes_logo_white.png" alt="Lowe's Logo" class="logo">
       <span class="dashboard-title">SOX GCC Delivery Dashboard</span>
     </div>
+    <button class="reset-btn" onclick="resetToDefaults()" title="Reset all data to default values">🔄 Reset Data</button>
   </header>
   
   <div class="container">
@@ -572,7 +621,6 @@
         <label for="progressFilter">Completion ≥</label>
         <select id="progressFilter">
           <option value="0">0%</option>
-<option value="0.1">10%</option>
           <option value="0.25">25%</option>
           <option value="0.5">50%</option>
           <option value="0.75">75%</option>
@@ -630,10 +678,15 @@
       </div>
     </div>
     <div id="editOverlay" onclick="closeEditPanel()"></div>
+    
+    <div id="saveNotification" class="save-notification">
+      ✓ Changes saved successfully!
+    </div>
   </div>
 
   <script>
-    const controls = [
+    // Default controls data
+    const defaultControls = [
       {name:"AC7.2 Emergency ID Provisioning",type:"Reliance",date:"2025-11-21",progress:1.0},
       {name:"AC9.1 - User Provisioning",type:"Reliance",date:"2026-01-28",progress:0.1},
       {name:"AC9.4 - Employee Transfers",type:"Independent",date:"2025-11-29",progress:1.0},
@@ -662,7 +715,41 @@
       {name:"MC20.2 - Review of Controls",type:"Independent",date:"2025-11-21",progress:1.0}
     ];
     
+    // Load controls from localStorage or use default
+    let controls = loadControls();
     let sortOrder = null; // null, 'asc', 'desc'
+    
+    function loadControls() {
+      const saved = localStorage.getItem('soxControls');
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch (e) {
+          console.error('Error loading saved data, using defaults');
+          return [...defaultControls];
+        }
+      }
+      return [...defaultControls];
+    }
+    
+    function saveControls() {
+      try {
+        localStorage.setItem('soxControls', JSON.stringify(controls));
+        showSaveNotification();
+        console.log('✓ Changes saved successfully');
+      } catch (e) {
+        console.error('Error saving data:', e);
+        alert('Error saving data. Please try again.');
+      }
+    }
+    
+    function showSaveNotification() {
+      const notification = document.getElementById('saveNotification');
+      notification.style.display = 'block';
+      setTimeout(() => {
+        notification.style.display = 'none';
+      }, 2000);
+    }
     
     function percent(num) { return Math.round(num * 100) + "%"; }
 
@@ -763,7 +850,7 @@
         const isDelayed = c.date < today && c.progress < 1;
         const tr = document.createElement("tr");
         const progressPercent = Math.round(c.progress * 100);
-        const progressColor = c.progress === 1 ? '#e0dd24' : '#111112';
+        const progressColor = c.progress === 1 ? '#4caf50' : '#004990';
         
         tr.innerHTML = `
           <td>${c.name}</td>
@@ -850,6 +937,7 @@
         if (updates.date) control.date = updates.date;
         if (updates.progress !== undefined) control.progress = updates.progress;
         if (updates.type) control.type = updates.type;
+        saveControls();
         renderSummary(); renderTable(); renderMilestones();
         console.log(`✓ Updated: ${controlName}`);
       } else {
@@ -860,6 +948,7 @@
     window.updateControls = function(newControls){
       controls.length = 0;
       newControls.forEach(c=>controls.push(c));
+      saveControls();
       renderSummary(); renderTable(); renderMilestones();
       console.log(`✓ Updated ${newControls.length} controls`);
     }
@@ -867,6 +956,16 @@
     window.getControls = function() {
       console.log(JSON.stringify(controls, null, 2));
       return controls;
+    }
+    
+    window.resetToDefaults = function() {
+      if (confirm('Are you sure you want to reset all data to default values? This cannot be undone.')) {
+        controls.length = 0;
+        defaultControls.forEach(c => controls.push({...c}));
+        saveControls();
+        renderSummary(); renderTable(); renderMilestones();
+        console.log('✓ Reset to default data');
+      }
     }
     
     window.openEditPanel = function(index) {
@@ -891,20 +990,23 @@
       controls[index].type = document.getElementById('editType').value;
       controls[index].date = document.getElementById('editDate').value;
       controls[index].progress = parseInt(document.getElementById('editProgress').value) / 100;
+      saveControls();
       renderSummary();
       renderTable();
       renderMilestones();
       closeEditPanel();
-      console.log(`✓ Updated: ${controls[index].name}`);
+      console.log(`✓ Updated and saved: ${controls[index].name}`);
     }
     
-    console.log("%c📊 SOX Dashboard - Enhanced Version", "color: #004990; font-size: 16px; font-weight: bold;");
+    console.log("%c📊 SOX Dashboard - Enhanced Version with Persistent Storage", "color: #004990; font-size: 16px; font-weight: bold;");
+    console.log("%c💾 All changes are automatically saved to your browser!", "color: #4caf50; font-weight: bold;");
     console.log("%c🎯 Click 'Edit' button in any row to update controls via UI", "color: #15b6e5; font-weight: bold;");
     console.log("%c📈 Click 'Progress' header to sort by completion percentage", "color: #15b6e5; font-weight: bold;");
-    console.log("%cOr use console commands:", "color: #15b6e5; font-weight: bold;");
+    console.log("%cConsole commands:", "color: #15b6e5; font-weight: bold;");
     console.log('updateControl("AC7.2 Emergency ID Provisioning", {date: "2025-12-01", progress: 0.8})');
     console.log('updateControls([{name:"AC7.2 Emergency ID Provisioning", type:"Reliance", date:"2025-12-01", progress:0.8}])');
-    console.log('getControls()');
+    console.log('getControls() // View current data');
+    console.log('resetToDefaults() // Reset all data to original values');
   </script>
 </body>
 </html>
