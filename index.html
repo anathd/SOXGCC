@@ -40,7 +40,7 @@
     header {
       display: flex;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
       background: linear-gradient(135deg, var(--lowes-blue) 0%, var(--lowes-dark-blue) 100%);
       padding: 24px 32px;
       border-radius: var(--radius-base);
@@ -66,9 +66,8 @@
       100% { transform: translateX(100%); }
     }
     
-    .reset-btn {
+    .sync-btn, .save-excel-btn {
       position: absolute;
-      right: 32px;
       background: rgba(255, 255, 255, 0.2);
       color: white;
       border: 2px solid rgba(255, 255, 255, 0.3);
@@ -82,10 +81,22 @@
       z-index: 2;
     }
     
-    .reset-btn:hover {
+    .sync-btn {
+      right: 32px;
+    }
+    
+    .save-excel-btn {
+      right: 180px;
+    }
+    
+    .sync-btn:hover, .save-excel-btn:hover {
       background: rgba(255, 255, 255, 0.3);
       border-color: rgba(255, 255, 255, 0.5);
       transform: translateY(-2px);
+    }
+    
+    #excelFileInput {
+      display: none;
     }
     
     .save-notification {
@@ -432,6 +443,305 @@
       text-shadow: 0 1px 2px rgba(0,0,0,0.1);
     }
     
+    /* ==================== ANALYTICS SECTION ==================== */
+    .analytics-section {
+      margin-top: 2.5rem;
+      margin-bottom: 2.5rem;
+    }
+    
+    .analytics-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+    }
+    
+    .analytics-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--lowes-blue);
+    }
+    
+    .analytics-toggle {
+      display: flex;
+      background: #e8eef5;
+      border-radius: 8px;
+      padding: 4px;
+    }
+    
+    .analytics-toggle button {
+      padding: 8px 16px;
+      border: none;
+      background: transparent;
+      color: var(--lowes-dark-blue);
+      font-weight: 600;
+      font-size: 0.85em;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: all 0.3s;
+    }
+    
+    .analytics-toggle button.active {
+      background: var(--lowes-blue);
+      color: white;
+      box-shadow: 0 2px 8px rgba(0, 73, 144, 0.3);
+    }
+    
+    .analytics-toggle button:hover:not(.active) {
+      background: rgba(0, 73, 144, 0.1);
+    }
+    
+    .analytics-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr) 2fr;
+      gap: 1.5rem;
+    }
+    
+    .analytics-card {
+      background: var(--lowes-white);
+      border-radius: var(--radius-base);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+      border-top: 3px solid var(--lowes-blue);
+    }
+    
+    .analytics-card-title {
+      font-size: 0.8rem;
+      color: var(--lowes-dark-blue);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+    }
+    
+    .donut-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+    }
+    
+    .donut-chart {
+      position: relative;
+      width: 90px;
+      height: 90px;
+    }
+    
+    .donut-chart svg {
+      transform: rotate(-90deg);
+    }
+    
+    .donut-chart circle {
+      fill: none;
+      stroke-width: 8;
+    }
+    
+    .donut-bg {
+      stroke: #e8eef5;
+    }
+    
+    .donut-progress {
+      stroke-linecap: round;
+      transition: stroke-dashoffset 0.6s ease;
+    }
+    
+    .donut-center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+    
+    .donut-value {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--lowes-blue);
+      line-height: 1;
+    }
+    
+    .donut-label {
+      font-size: 0.65rem;
+      color: #666;
+      margin-top: 2px;
+    }
+    
+    .donut-legend {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.8rem;
+    }
+    
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    
+    .timeline-chart {
+      height: 180px;
+      position: relative;
+    }
+    
+    .timeline-svg {
+      width: 100%;
+      height: 100%;
+    }
+    
+    .timeline-grid-line {
+      stroke: #e8eef5;
+      stroke-width: 1;
+    }
+    
+    .timeline-axis-label {
+      font-size: 9px;
+      fill: #666;
+    }
+    
+    .timeline-line {
+      fill: none;
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    
+    .timeline-dot {
+      transition: r 0.2s;
+      cursor: pointer;
+    }
+    
+    .timeline-dot:hover {
+      r: 5;
+    }
+    
+    .timeline-legend {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-top: 12px;
+      font-size: 0.8rem;
+    }
+    
+    .timeline-legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .timeline-legend-line {
+      width: 20px;
+      height: 3px;
+      border-radius: 2px;
+    }
+    
+    @media (max-width: 900px) {
+      .analytics-grid {
+        grid-template-columns: 1fr;
+      }
+      .analytics-header {
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+      }
+    }
+    /* ==================== END ANALYTICS SECTION ==================== */
+
+    /* ==================== OBSERVATIONS SECTION ==================== */
+    .observations-section {
+      margin-top: 2.5rem;
+      margin-bottom: 2.5rem;
+    }
+    
+    .observations-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    
+    .observations-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--lowes-blue);
+    }
+    
+    .observations-container {
+      background: var(--lowes-white);
+      border-radius: var(--radius-base);
+      padding: 20px 24px;
+      box-shadow: var(--shadow-sm);
+      border-left: 4px solid #ff9800;
+    }
+    
+    .observation-item {
+      padding: 12px 0;
+      border-bottom: 1px solid #edf2f7;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    
+    .observation-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+    
+    .observation-item:first-child {
+      padding-top: 0;
+    }
+    
+    .observation-bullet {
+      width: 8px;
+      height: 8px;
+      min-width: 8px;
+      background: #ff9800;
+      border-radius: 50%;
+      margin-top: 6px;
+    }
+    
+    .observation-content {
+      flex: 1;
+    }
+    
+    .observation-control {
+      font-weight: 700;
+      color: var(--lowes-blue);
+      font-size: 0.95rem;
+      margin-bottom: 4px;
+    }
+    
+    .observation-text {
+      color: var(--lowes-dark-blue);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+    
+    .observation-tag {
+      display: inline-block;
+      background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+      color: #e65100;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-right: 8px;
+      text-transform: uppercase;
+    }
+    
+    .no-observations {
+      color: #666;
+      font-style: italic;
+      text-align: center;
+      padding: 20px;
+    }
+    /* ==================== END OBSERVATIONS SECTION ==================== */
+
     .milestones {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -587,6 +897,8 @@
       #editPanel { min-width: 90vw; padding: 24px; }
     }
   </style>
+  <!-- SheetJS library for Excel read/write -->
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
 </head>
 <body>
   <header>
@@ -594,7 +906,9 @@
       <img src="https://www.lowescdn.com/images/logos/lowes_logo_white.png" alt="Lowe's Logo" class="logo">
       <span class="dashboard-title">SOX GCC Delivery Dashboard</span>
     </div>
-    <button class="reset-btn" onclick="resetToDefaults()" title="Reset all data to default values">🔄 Reset Data</button>
+    <button class="sync-btn" onclick="document.getElementById('excelFileInput').click()" title="Load data from Excel file">📂 Load Excel</button>
+    <button class="save-excel-btn" onclick="downloadExcel()" title="Save data to Excel file">💾 Save Excel</button>
+    <input type="file" id="excelFileInput" accept=".xlsx,.xls" onchange="handleExcelFileSelect(event)" />
   </header>
   
   <div class="container">
@@ -648,6 +962,54 @@
       <tbody></tbody>
     </table>
 
+    <!-- ==================== ANALYTICS SECTION ==================== -->
+    <section class="analytics-section" id="analyticsSection">
+      <div class="analytics-header">
+        <span class="analytics-title">📊 Analytics</span>
+        <div class="analytics-toggle">
+          <button class="active" onclick="setAnalyticsView('all')">All</button>
+          <button onclick="setAnalyticsView('reliance')">Reliance</button>
+          <button onclick="setAnalyticsView('independent')">Independent</button>
+        </div>
+      </div>
+      <div class="analytics-grid">
+        <div class="analytics-card">
+          <div class="analytics-card-title">Reliance Controls</div>
+          <div class="donut-container" id="relianceDonut"></div>
+        </div>
+        <div class="analytics-card">
+          <div class="analytics-card-title">Independent Controls</div>
+          <div class="donut-container" id="independentDonut"></div>
+        </div>
+        <div class="analytics-card">
+          <div class="analytics-card-title">Delivery Timeline (Expected vs Actual)</div>
+          <div class="timeline-chart" id="timelineChart"></div>
+          <div class="timeline-legend">
+            <div class="timeline-legend-item">
+              <div class="timeline-legend-line" style="background: var(--lowes-blue);"></div>
+              <span>Expected</span>
+            </div>
+            <div class="timeline-legend-item">
+              <div class="timeline-legend-line" style="background: #4caf50;"></div>
+              <span>Actual Completed</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- ==================== END ANALYTICS SECTION ==================== -->
+
+    <!-- ==================== OBSERVATIONS SECTION ==================== -->
+    <section class="observations-section" id="observationsSection">
+      <div class="observations-header">
+        <span class="observations-title">⚠️ Process Improvement</span>
+      </div>
+      <div class="observations-container" id="observationsContainer">
+        <!-- Observations will be rendered here -->
+      </div>
+    </section>
+    <!-- ==================== END OBSERVATIONS SECTION ==================== -->
+
     <section class="milestones" id="milestonesSection"></section>
     
     <div id="editPanel">
@@ -688,36 +1050,90 @@
     // Default controls data
     const defaultControls = [
       {name:"AC7.2 Emergency ID Provisioning",type:"Reliance",date:"2025-11-21",progress:1.0},
-      {name:"AC9.1 - User Provisioning",type:"Reliance",date:"2026-01-28",progress:0.1},
-      {name:"AC9.4 - Employee Transfers",type:"Independent",date:"2025-11-29",progress:1.0},
-      {name:"AC11.1 - Terminations Standard Automated Process",type:"Reliance",date:"2025-12-03",progress:0.0},
-      {name:"AC11.3 - Inactive User Account Maintenance",type:"Reliance",date:"2025-12-02",progress:0.85},
-      {name:"AC11.4 - IT Contractor Terminations",type:"Reliance",date:"2025-12-03",progress:0.4},
-      {name:"AC16.5 - Review of Access for Direct Changes to SOX Distributed Databases",type:"Independent",date:"2025-12-05",progress:0.0},
-      {name:"AC16.7 - CVS SOD Review",type:"Independent",date:"2025-12-13",progress:0.0},
-      {name:"AC19.1 - Elevated Access",type:"Independent",date:"2025-11-28",progress:0.85},
-      {name:"AC20.4 - Review of Access for Direct Changes to SOX Distributed Databases",type:"Independent",date:"2025-11-28",progress:0.85},
-      {name:"AC19.5 - Elevated Access - Validation of Elevated Access Scope for Certifications",type:"Reliance",date:"2025-12-29",progress:0.0},
-      {name:"CM12.2 - SOX Application Password Configuration Settings",type:"Reliance",date:"2026-01-28",progress:0.5},
-      {name:"CM16.5 - Bitbucket Pull Request Master Configuration Enabled",type:"Reliance",date:"2026-01-17",progress:0.0},
-      {name:"CC 1.6 - Application Change Review Workday",type:"Reliance",date:"2026-01-09",progress:0.0},
-      {name:"CC 1.6 - Application Change Review LX",type:"Reliance",date:"2026-01-09",progress:0.0},
+      {name:"AC9.1 - User Provisioning",type:"Reliance",date:"2026-01-28",progress:0.3},
+      {name:"AC9.4 - Employee Transfers",type:"Independent",date:"2025-11-28",progress:1.0},
+      {name:"AC11.1 - Terminations Standard Automated Process",type:"Reliance",date:"2025-12-12",progress:0.0},
+      {name:"AC11.3 - Inactive User Account Maintenance",type:"Reliance",date:"2025-12-05",progress:1.0},
+      {name:"AC11.4 - IT Contractor Terminations",type:"Reliance",date:"2025-12-12",progress:0.7},
+      {name:"AC16.5 - Review of Access for Direct Changes to SOX Distributed Databases",type:"Independent",date:"2026-01-09",progress:0.7},
+      {name:"AC16.7 - CVS SOD Review",type:"Independent",date:"2025-12-19",progress:1.0},
+      {name:"AC19.1 - Elevated Access",type:"Independent",date:"2026-01-09",progress:0.85},
+      {name:"AC20.4 - Review of Access for Direct Changes to SOX Distributed Databases",type:"Independent",date:"2026-01-09",progress:0.85},
+      {name:"AC19.5 - Elevated Access - Validation of Elevated Access Scope for Certifications",type:"Reliance",date:"2025-12-26",progress:0.0},
+      {name:"CM12.2 - SOX Application Password Configuration Settings",type:"Reliance",date:"2026-01-28",progress:1.0},
+      {name:"CM16.5 - Bitbucket Pull Request Master Configuration Enabled",type:"Reliance",date:"2026-01-16",progress:0.0},
+      {name:"CC 1.6 - Application Change Review Workday",type:"Reliance",date:"2025-12-19",progress:1.0},
+      {name:"CC 1.6 - Application Change Review LX",type:"Reliance",date:"2025-12-26",progress:0.0},
       {name:"CC 1.3 - Change Management",type:"Independent",date:"2026-01-28",progress:0.0},
-      {name:"CC 06.6 - DBA Direct Data Changes Made to Teradata and DB2 for zOS Are Reviewed",type:"Independent",date:"2025-12-06",progress:0.0},
-      {name:"CO 5.2 - Production Infrastructure Storage, Database Backup and Restoration",type:"Reliance",date:"2025-11-28",progress:0.85},
-      {name:"CO2.1 - Production Mainframe Job Monitoring",type:"Reliance",date:"2025-12-08",progress:0.0},
+      {name:"CC 06.6 - DBA Direct Data Changes Made to Teradata and DB2 for zOS Are Reviewed",type:"Independent",date:"2025-12-12",progress:1.0},
+      {name:"CO 5.2 - Production Infrastructure Storage, Database Backup and Restoration",type:"Reliance",date:"2025-11-28",progress:1.0},
+      {name:"CO2.1 - Production Mainframe Job Monitoring",type:"Reliance",date:"2025-12-19",progress:1.0},
       {name:"CO02.4 ERP to FDI alert mechanism",type:"Independent",date:"2026-01-09",progress:0.0},
-      {name:"CO2.3 - Production Job Monitoring - Distributed",type:"Independent",date:"2026-01-17",progress:0.1},
-      {name:"CO02.5 - Sail Point Batch Monitoring",type:"Reliance",date:"2025-12-12",progress:0.0},
-      {name:"MC 1.5 - Security Incident Event Management Review",type:"Reliance",date:"2025-12-07",progress:0.0},
-      {name:"SD01.1 - System Development - Project Selection ",type:"Independent",date:"2025-12-12",progress:0.0},
-      {name:"SD01.2 - System Development - Stage Gates",type:"Independent",date:"2026-01-17",progress:0.0},
+      {name:"CO2.3 - Production Job Monitoring - Distributed",type:"Independent",date:"2026-01-16",progress:0.3},
+      {name:"CO02.5 - Sail Point Batch Monitoring",type:"Reliance",date:"2025-12-26",progress:0.0},
+      {name:"MC 1.5 - Security Incident Event Management Review",type:"Reliance",date:"2025-12-19",progress:0.0},
+      {name:"SD01.1 - System Development - Project Selection ",type:"Independent",date:"2025-12-12",progress:1.0},
+      {name:"SD01.2 - System Development - Stage Gates",type:"Independent",date:"2026-01-16",progress:0.0},
       {name:"MC20.2 - Review of Controls",type:"Independent",date:"2025-11-21",progress:1.0}
     ];
     
     // Load controls from localStorage or use default
     let controls = loadControls();
     let sortOrder = null; // null, 'asc', 'desc'
+    
+    // ==================== OBSERVATIONS DATA ====================
+    const defaultObservations = [
+      {
+        control: "CO5.2 Backup monitoring",
+        observation: "MongoDB – EventStore (21 TB Dataset): Daily cron job was disabled due to excessive runtime (2–3 days) causing overlaps. Interim: Backup frequency changed to every 72 hours. Long-term: Dataset being split into smaller volumes post-BFCM to reschedule daily backup runs."
+      }
+    ];
+    
+    let observations = loadObservations();
+    
+    function loadObservations() {
+      const saved = localStorage.getItem('soxObservations');
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch (e) {
+          console.error('Error loading saved observations, using defaults');
+          return [...defaultObservations];
+        }
+      }
+      return [...defaultObservations];
+    }
+    
+    function saveObservations() {
+      try {
+        localStorage.setItem('soxObservations', JSON.stringify(observations));
+      } catch (e) {
+        console.error('Error saving observations:', e);
+      }
+    }
+    
+    function renderObservations() {
+      const container = document.getElementById('observationsContainer');
+      
+      if (observations.length === 0) {
+        container.innerHTML = '<div class="no-observations">No observations recorded.</div>';
+        return;
+      }
+      
+      container.innerHTML = observations.map((obs, index) => `
+        <div class="observation-item">
+          <div class="observation-bullet"></div>
+          <div class="observation-content">
+            <div class="observation-control">
+              <span class="observation-tag">Observation</span>
+              ${obs.control}
+            </div>
+            <div class="observation-text">${obs.observation}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+    // ==================== END OBSERVATIONS DATA ====================
     
     function loadControls() {
       const saved = localStorage.getItem('soxControls');
@@ -921,6 +1337,168 @@
       }
     }
 
+    // ==================== ANALYTICS FUNCTIONS ====================
+    let analyticsView = 'all';
+    
+    function setAnalyticsView(view) {
+      analyticsView = view;
+      document.querySelectorAll('.analytics-toggle button').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.textContent.toLowerCase() === view || (view === 'all' && btn.textContent === 'All')) {
+          btn.classList.add('active');
+        }
+      });
+      renderAnalytics();
+    }
+    
+    function renderDonutChart(containerId, completed, total, color) {
+      const container = document.getElementById(containerId);
+      const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+      const circumference = 2 * Math.PI * 36;
+      const offset = circumference - (percentage / 100) * circumference;
+      
+      container.innerHTML = `
+        <div class="donut-chart">
+          <svg width="90" height="90" viewBox="0 0 90 90">
+            <circle class="donut-bg" cx="45" cy="45" r="36"></circle>
+            <circle class="donut-progress" cx="45" cy="45" r="36" 
+              stroke="${color}" 
+              stroke-dasharray="${circumference}" 
+              stroke-dashoffset="${offset}"></circle>
+          </svg>
+          <div class="donut-center">
+            <div class="donut-value">${percentage}%</div>
+            <div class="donut-label">Complete</div>
+          </div>
+        </div>
+        <div class="donut-legend">
+          <div class="legend-item">
+            <div class="legend-dot" style="background: ${color};"></div>
+            <span>Completed: ${completed}</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background: #e8eef5;"></div>
+            <span>Remaining: ${total - completed}</span>
+          </div>
+        </div>
+      `;
+    }
+    
+    function renderTimelineChart() {
+      const container = document.getElementById('timelineChart');
+      const startDate = new Date('2025-11-21');
+      const endDate = new Date('2026-01-30');
+      
+      // Generate 7-day intervals
+      const intervals = [];
+      let current = new Date(startDate);
+      while (current <= endDate) {
+        intervals.push(new Date(current));
+        current.setDate(current.getDate() + 7);
+      }
+      if (intervals[intervals.length - 1] < endDate) {
+        intervals.push(new Date(endDate));
+      }
+      
+      // Filter controls based on view
+      let filteredControls = controls;
+      if (analyticsView === 'reliance') {
+        filteredControls = controls.filter(c => c.type === 'Reliance');
+      } else if (analyticsView === 'independent') {
+        filteredControls = controls.filter(c => c.type === 'Independent');
+      }
+      
+      // Calculate expected and actual for each interval
+      const expectedData = [];
+      const actualData = [];
+      
+      intervals.forEach(intervalDate => {
+        const dateStr = intervalDate.toISOString().split('T')[0];
+        
+        // Expected: cumulative count of controls with date <= interval date
+        const expected = filteredControls.filter(c => c.date <= dateStr).length;
+        expectedData.push(expected);
+        
+        // Actual: cumulative count of completed controls with date <= interval date
+        const actual = filteredControls.filter(c => c.progress === 1 && c.date <= dateStr).length;
+        actualData.push(actual);
+      });
+      
+      const maxValue = Math.max(...expectedData, ...actualData, 1);
+      const width = container.clientWidth || 400;
+      const height = 180;
+      const padding = { top: 20, right: 20, bottom: 35, left: 35 };
+      const chartWidth = width - padding.left - padding.right;
+      const chartHeight = height - padding.top - padding.bottom;
+      
+      // Generate points
+      const getX = (i) => padding.left + (i / (intervals.length - 1)) * chartWidth;
+      const getY = (val) => padding.top + chartHeight - (val / maxValue) * chartHeight;
+      
+      const expectedPoints = expectedData.map((val, i) => `${getX(i)},${getY(val)}`).join(' ');
+      const actualPoints = actualData.map((val, i) => `${getX(i)},${getY(val)}`).join(' ');
+      
+      // Generate grid lines
+      const gridLines = [];
+      const yTicks = 4;
+      for (let i = 0; i <= yTicks; i++) {
+        const y = padding.top + (i / yTicks) * chartHeight;
+        gridLines.push(`<line class="timeline-grid-line" x1="${padding.left}" y1="${y}" x2="${width - padding.right}" y2="${y}"></line>`);
+        const val = Math.round(maxValue - (i / yTicks) * maxValue);
+        gridLines.push(`<text class="timeline-axis-label" x="${padding.left - 8}" y="${y + 3}" text-anchor="end">${val}</text>`);
+      }
+      
+      // Generate x-axis labels (show every other label to avoid crowding)
+      const xLabels = intervals.map((date, i) => {
+        if (i % 2 === 0 || i === intervals.length - 1) {
+          const label = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+          return `<text class="timeline-axis-label" x="${getX(i)}" y="${height - 8}" text-anchor="middle">${label}</text>`;
+        }
+        return '';
+      }).join('');
+      
+      // Generate dots
+      const expectedDots = expectedData.map((val, i) => 
+        `<circle class="timeline-dot" cx="${getX(i)}" cy="${getY(val)}" r="3.5" fill="#004990"></circle>`
+      ).join('');
+      
+      const actualDots = actualData.map((val, i) => 
+        `<circle class="timeline-dot" cx="${getX(i)}" cy="${getY(val)}" r="3.5" fill="#4caf50"></circle>`
+      ).join('');
+      
+      container.innerHTML = `
+        <svg class="timeline-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="xMidYMid meet">
+          ${gridLines.join('')}
+          ${xLabels}
+          <polyline class="timeline-line" points="${expectedPoints}" stroke="#004990"></polyline>
+          <polyline class="timeline-line" points="${actualPoints}" stroke="#4caf50"></polyline>
+          ${expectedDots}
+          ${actualDots}
+        </svg>
+      `;
+    }
+    
+    function renderAnalytics() {
+      // Reliance donut
+      const relianceControls = controls.filter(c => c.type === 'Reliance');
+      const relianceCompleted = relianceControls.filter(c => c.progress === 1).length;
+      renderDonutChart('relianceDonut', relianceCompleted, relianceControls.length, '#004990');
+      
+      // Independent donut
+      const independentControls = controls.filter(c => c.type === 'Independent');
+      const independentCompleted = independentControls.filter(c => c.progress === 1).length;
+      renderDonutChart('independentDonut', independentCompleted, independentControls.length, '#15b6e5');
+      
+      // Timeline chart
+      renderTimelineChart();
+    }
+    
+    // Resize handler for timeline chart
+    window.addEventListener('resize', () => {
+      renderTimelineChart();
+    });
+    // ==================== END ANALYTICS FUNCTIONS ====================
+
     document.getElementById("filters").addEventListener("input", ()=>{
       renderTable();
       renderMilestones();
@@ -929,6 +1507,8 @@
     renderSummary();
     renderTable();
     renderMilestones();
+    renderAnalytics();
+    renderObservations();
     updateSortIcon();
 
     window.updateControl = function(controlName, updates) {
@@ -938,7 +1518,7 @@
         if (updates.progress !== undefined) control.progress = updates.progress;
         if (updates.type) control.type = updates.type;
         saveControls();
-        renderSummary(); renderTable(); renderMilestones();
+        renderSummary(); renderTable(); renderMilestones(); renderAnalytics();
         console.log(`✓ Updated: ${controlName}`);
       } else {
         console.error(`✗ Control not found: ${controlName}`);
@@ -949,7 +1529,7 @@
       controls.length = 0;
       newControls.forEach(c=>controls.push(c));
       saveControls();
-      renderSummary(); renderTable(); renderMilestones();
+      renderSummary(); renderTable(); renderMilestones(); renderAnalytics();
       console.log(`✓ Updated ${newControls.length} controls`);
     }
     
@@ -963,7 +1543,7 @@
         controls.length = 0;
         defaultControls.forEach(c => controls.push({...c}));
         saveControls();
-        renderSummary(); renderTable(); renderMilestones();
+        renderSummary(); renderTable(); renderMilestones(); renderAnalytics();
         console.log('✓ Reset to default data');
       }
     }
@@ -994,12 +1574,166 @@
       renderSummary();
       renderTable();
       renderMilestones();
+      renderAnalytics();
       closeEditPanel();
       console.log(`✓ Updated and saved: ${controls[index].name}`);
     }
     
+    // ==================== EXCEL FILE HANDLING ====================
+    const EXCEL_FILE_NAME = 'SOX_Dashboard.xlsx';
+    const SHEET_NAME = 'Controls';
+    
+    window.handleExcelFileSelect = function(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: 'array', cellDates: true });
+          
+          const sheet = workbook.Sheets[SHEET_NAME];
+          if (!sheet) {
+            alert('Sheet "' + SHEET_NAME + '" not found in Excel file. Please make sure the sheet is named "Controls".');
+            return;
+          }
+          
+          const jsonData = XLSX.utils.sheet_to_json(sheet, { raw: false, dateNF: 'yyyy-mm-dd' });
+          
+          controls.length = 0;
+          jsonData.forEach((row, index) => {
+            controls.push({
+              name: row['Control Name'] || '',
+              type: row['Type'] || 'Reliance',
+              date: parseExcelDate(row['Date']),
+              progress: parseFloat(row['Progress']) || 0
+            });
+          });
+          
+          // Load Observations sheet if it exists
+          const obsSheet = workbook.Sheets['Observations'];
+          if (obsSheet) {
+            const obsData = XLSX.utils.sheet_to_json(obsSheet, { raw: true });
+            observations.length = 0;
+            obsData.forEach(row => {
+              // Support both old and new column names
+              const control = row['Control Name'] || row['Control'] || '';
+              const observation = row['Potential Observation'] || row['Observation'] || '';
+              if (control && observation) {
+                observations.push({
+                  control: control,
+                  observation: observation
+                });
+              }
+            });
+            saveObservations();
+            console.log('✓ Loaded ' + observations.length + ' observations from Excel');
+          }
+          
+          saveControls();
+          renderSummary();
+          renderTable();
+          renderMilestones();
+          renderAnalytics();
+          renderObservations();
+          
+          console.log('✓ Loaded ' + controls.length + ' controls from Excel');
+          
+        } catch (error) {
+          console.error('Error reading Excel:', error);
+          alert('Error reading Excel file: ' + error.message);
+        }
+      };
+      reader.readAsArrayBuffer(file);
+      event.target.value = '';
+    }
+    
+    function parseExcelDate(dateValue) {
+      if (!dateValue) return '';
+      if (dateValue instanceof Date) {
+        return formatDateForExcel(dateValue);
+      }
+      if (typeof dateValue === 'string') {
+        const parsed = new Date(dateValue);
+        if (!isNaN(parsed.getTime())) {
+          return formatDateForExcel(parsed);
+        }
+        return dateValue;
+      }
+      if (typeof dateValue === 'number') {
+        const date = XLSX.SSF.parse_date_code(dateValue);
+        return date.y + '-' + String(date.m).padStart(2, '0') + '-' + String(date.d).padStart(2, '0');
+      }
+      return '';
+    }
+    
+    function formatDateForExcel(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return year + '-' + month + '-' + day;
+    }
+    
+    window.downloadExcel = function() {
+      if (controls.length === 0) {
+        alert('No data to save.');
+        return;
+      }
+      
+      try {
+        // Controls sheet
+        const wsData = [['Control Name', 'Type', 'Date', 'Progress']];
+        
+        controls.forEach(control => {
+          wsData.push([
+            control.name,
+            control.type,
+            control.date ? new Date(control.date) : '',
+            control.progress
+          ]);
+        });
+        
+        const newWorkbook = XLSX.utils.book_new();
+        const worksheet = XLSX.utils.aoa_to_sheet(wsData);
+        
+        worksheet['!cols'] = [
+          { wch: 70 },
+          { wch: 15 },
+          { wch: 12 },
+          { wch: 10 }
+        ];
+        
+        XLSX.utils.book_append_sheet(newWorkbook, worksheet, SHEET_NAME);
+        
+        // Observations sheet
+        const obsData = [['Control Name', 'Potential Observation']];
+        observations.forEach(obs => {
+          obsData.push([obs.control, obs.observation]);
+        });
+        
+        const obsWorksheet = XLSX.utils.aoa_to_sheet(obsData);
+        obsWorksheet['!cols'] = [
+          { wch: 40 },
+          { wch: 120 }
+        ];
+        
+        XLSX.utils.book_append_sheet(newWorkbook, obsWorksheet, 'Observations');
+        
+        XLSX.writeFile(newWorkbook, EXCEL_FILE_NAME);
+        
+        console.log('✓ Excel file downloaded: ' + EXCEL_FILE_NAME);
+        
+      } catch (error) {
+        console.error('Error saving Excel:', error);
+        alert('Failed to save Excel file: ' + error.message);
+      }
+    }
+    
     console.log("%c📊 SOX Dashboard - Enhanced Version with Persistent Storage", "color: #004990; font-size: 16px; font-weight: bold;");
     console.log("%c💾 All changes are automatically saved to your browser!", "color: #4caf50; font-weight: bold;");
+    console.log("%c📂 Click 'Load Excel' to import data from SOX_Dashboard.xlsx", "color: #15b6e5; font-weight: bold;");
+    console.log("%c💾 Click 'Save Excel' to export data to SOX_Dashboard.xlsx", "color: #15b6e5; font-weight: bold;");
     console.log("%c🎯 Click 'Edit' button in any row to update controls via UI", "color: #15b6e5; font-weight: bold;");
     console.log("%c📈 Click 'Progress' header to sort by completion percentage", "color: #15b6e5; font-weight: bold;");
     console.log("%cConsole commands:", "color: #15b6e5; font-weight: bold;");
